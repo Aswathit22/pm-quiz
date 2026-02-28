@@ -8,6 +8,8 @@ import {
   type RawQuestion,
 } from "./data/topics";
 
+import { trackEvent } from "./lib/ga";
+
 type Attempt = {
   topicId: string;
   topicTitle: string;
@@ -19,6 +21,22 @@ type Attempt = {
 };
 
 const ATTEMPT_KEY = "quiz_attempts";
+const ATTEMPT_NO_PREFIX = "quiz_attempt_no_";
+
+function getAttemptNo(topicId: string) {
+  try {
+    const raw = localStorage.getItem(`${ATTEMPT_NO_PREFIX}${topicId}`);
+    return raw ? Number(raw) || 0 : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function incrementAttemptNo(topicId: string) {
+  const next = getAttemptNo(topicId) + 1;
+  localStorage.setItem(`${ATTEMPT_NO_PREFIX}${topicId}`, String(next));
+  return next;
+}
 
 /** Randomization helpers */
 function shuffle<T>(arr: T[]) {
@@ -77,6 +95,8 @@ function formatDate(iso: string) {
 export default function Home() {
   const quizRef = useRef<HTMLDivElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
+  const [quizStartMs, setQuizStartMs] = useState<number | null>(null);
+  const [attemptNo, setAttemptNo] = useState<number>(0);
 
   // Topics for dropdown
   const topicList: Topic[] = useMemo(
@@ -164,6 +184,15 @@ export default function Home() {
     const built = rawTopic ? buildQuizQuestions(rawTopic.questions) : [];
 
     setQuizQuestions(built);
+    const nextAttempt = incrementAttemptNo(selectedTopicId);
+    setAttemptNo(nextAttempt);
+    setQuizStartMs(Date.now());
+
+    trackEvent("quiz_started", {
+      topic: selectedTopic?.title ?? selectedTopicId,
+      topic_id: selectedTopicId,
+      attempt_count: nextAttempt,
+    });
     setStarted(true);
     setCompleted(false);
     setIndex(0);
@@ -213,6 +242,19 @@ export default function Home() {
 
       saveAttempt(attempt);
       setAttempts(loadAttempts());
+      const timeSpentMs = quizStartMs ? Date.now() - quizStartMs : 0;
+      
+
+      const attemptCountForEvent = getAttemptNo(selectedTopicId);
+      trackEvent("quiz_completed", {
+        topic: selectedTopic?.title ?? selectedTopicId,
+        topic_id: selectedTopicId,
+        attempt_count: attemptCountForEvent,
+        score_percentage: percent,
+        correct_count: finalScore,
+        total_questions: total,
+        time_spent_seconds: Math.round(timeSpentMs / 1000),
+      });
 
       setCompleted(true);
       setStarted(false);
@@ -254,7 +296,7 @@ export default function Home() {
 
             <div className="mt-7 grid gap-5 md:grid-cols-2 items-stretch">
               {/* Topic card */}
-              <div className="rounded-3xl border-2 border-fuchsia-200/80 bg-stone-50/90 backdrop-blur p-6 shadow-sm ring-1 ring-black-50/50">
+              <div className="rounded-3xl border-2 border-fuchsia-200/80 bg-stone-50/90 backdrop-blur p-6 shadow-sm ring-1 ring-black/5">
                 <div className="text-sm font-semibold text-indigo-900">
                   1) Select a topic
                 </div>
@@ -297,7 +339,7 @@ export default function Home() {
               </div>
 
               {/* Start card (NO rainbow background) */}
-              <div className="rounded-3xl border-2 border-fuchsia-200/80 bg-stone-50/90 backdrop-blur p-6 shadow-sm ring-1 ring-black-50/50">
+              <div className="rounded-3xl border-2 border-fuchsia-200/80 bg-stone-50/90 backdrop-blur p-6 shadow-sm ring-1 ring-black/5">
                 <div>
                   <div className="text-sm font-semibold text-slate-900">
                     2) Start the quiz
@@ -430,7 +472,7 @@ export default function Home() {
             {selectedTopicId && completed && (
               <div
                 ref={resultRef}
-                className="rounded-3xl border-2 border-fuchsia-200/80 bg-stone-50/90 backdrop-blur p-6 shadow-sm ring-1 ring-black-50/50"
+                className="rounded-3xl border-2 border-fuchsia-200/80 bg-stone-50/90 backdrop-blur p-6 shadow-sm ring-1 ring-black/5"
               >
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
