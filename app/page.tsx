@@ -22,14 +22,6 @@ type Attempt = {
 
 const ATTEMPT_KEY = "quiz_attempts";
 const ATTEMPT_NO_PREFIX = "quiz_attempt_no_";
-const landingFiredRef = useRef(false);
-
-useEffect(() => {
-  if (landingFiredRef.current) return;
-  landingFiredRef.current = true;
-
-  trackEvent("quiz_landing_viewed");
-}, []);
 
 function getAttemptNo(topicId: string) {
   try {
@@ -105,6 +97,14 @@ export default function Home() {
   const resultRef = useRef<HTMLDivElement | null>(null);
   const [quizStartMs, setQuizStartMs] = useState<number | null>(null);
   const [attemptNo, setAttemptNo] = useState<number>(0);
+  const landingFiredRef = useRef(false);
+
+  useEffect(() => {
+    if (landingFiredRef.current) return;
+    landingFiredRef.current = true;
+
+    trackEvent("quiz_landing_viewed");
+  }, []);
 
   // Topics for dropdown
   const topicList: Topic[] = useMemo(
