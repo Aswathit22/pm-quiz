@@ -36,23 +36,21 @@ export type QuizQuestion = {
       questions: [
         {
           q: "What best describes AI (in product terms)?",
-          correct:
-            "Software that learns patterns from data to make predictions or generate outputs",
+          correct: "Software that learns patterns from data to predict or generate outputs",
           wrong: [
-            "Software that always produces the same output for the same input",
-            "A database that stores knowledge",
-            "A system that only works with internet access",
+            "Software that runs fixed rules and gives the same output for the same input",
+            "A system that stores information and retrieves it like a database",
+            "A tool that only works when connected to the internet",
           ],
-          explanation:
-            "AI learns patterns; deterministic rules are traditional software.",
+          explanation: "AI learns patterns; deterministic rules are traditional software.",
         },
         {
           q: "Machine Learning is best described as:",
           correct: "Learning patterns from data to perform a task",
           wrong: [
-            "Writing a large number of rules by hand",
-            "Compressing data to save storage",
-            "A UI design technique",
+            "Writing many hand-made rules to handle all cases",
+            "Compressing data mainly to reduce storage size",
+            "Designing user interfaces and screen flows",
           ],
           explanation: "ML is the “learn from data” approach within AI.",
         },
@@ -60,65 +58,67 @@ export type QuizQuestion = {
           q: "Deep Learning differs from classic ML mainly because it:",
           correct: "Learns features automatically using neural networks",
           wrong: [
-            "Avoids using data",
-            "Only works for text",
-            "Cannot generalize to new examples",
+            "Avoids using data and relies on rules",
+            "Works only for text-based problems",
+            "Cannot generalize beyond training examples",
           ],
-          explanation:
-            "Deep learning reduces dependence on hand-crafted features.",
+          explanation: "Deep learning reduces dependence on hand-crafted features.",
         },
         {
           q: "Generative AI is primarily about:",
           correct: "Generating new content like text, images, or code",
           wrong: [
-            "Sorting data faster",
-            "Encrypting user data",
+            "Sorting and filtering data faster",
+            "Encrypting user data for security",
             "Storing prompts in a database",
           ],
           explanation: "Generative AI creates content, not just predictions.",
         },
         {
           q: "“Prompt” in an LLM system means:",
-          correct: "The user’s instruction/input to the model",
+          correct: "The instruction and context you give the model",
           wrong: [
             "The model’s training dataset",
-            "The database schema",
+            "The product’s database schema",
             "The model’s accuracy score",
           ],
-          explanation:
-            "Prompt is the instruction/context you give at inference time.",
+          explanation: "Prompt is the instruction/context you give at inference time.",
         },
         {
           q: "Rule-based AI systems are most limited because:",
-          correct: "They require explicit rules and don’t scale well with complexity",
+          correct: "They need explicit rules and don’t scale well as complexity grows",
           wrong: [
-            "They are too random",
-            "They need GPUs to run",
-            "They can’t be tested",
+            "They behave too randomly to trust",
+            "They require GPUs to run at all",
+            "They cannot be tested reliably",
           ],
           explanation: "Rule explosion and edge cases kill scalability.",
         },
         {
           q: "In classic ML (pre-deep learning), performance often depended heavily on:",
-          correct: "Hand-crafted features",
-          wrong: ["Token prediction", "User interface animations", "Blockchain"],
+          correct: "Hand-crafted features (feature engineering)",
+          wrong: [
+            "Token prediction as the main method",
+            "UI animations and micro-interactions",
+            "Blockchain-based validation",
+          ],
           explanation: "Feature engineering was a major driver of results.",
         },
         {
           q: "Transformers were a big turning point mainly because they:",
-          correct: "Made large-scale training on sequences (like text) more effective",
+          correct: "Enabled more effective large-scale learning on sequences like text",
           wrong: [
-            "Removed the need for any data",
-            "Prevented hallucinations completely",
-            "Only work for images",
+            "Removed the need for training data",
+            "Eliminated hallucinations completely",
+            "Worked only for image tasks",
           ],
           explanation: "Transformers improved learning from sequences and scaling.",
         },
         {
           q: "A “foundation model” is best described as:",
-          correct: "A model pre-trained on broad data and adaptable to many tasks",
+          correct: "A model trained broadly and adaptable to many tasks",
           wrong: [
-            "A model trained for a single narrow task only",
+            "A model trained for one narrow task only",
             "A model that never needs updates",
             "A model that stores data like a database",
           ],
@@ -126,28 +126,27 @@ export type QuizQuestion = {
         },
         {
           q: "“Training” vs “Inference” — which is correct?",
-          correct:
-            "Training = learning from data; Inference = generating outputs using the trained model",
+          correct: "Training learns from data; inference uses the trained model to generate outputs",
           wrong: [
-            "Training = using the model; Inference = collecting data",
-            "Training = UI design; Inference = backend development",
+            "Training is using the model; inference is collecting data",
+            "Training is UI design; inference is backend development",
             "Training and inference are the same thing",
           ],
           explanation: "Training learns; inference uses.",
         },
         {
           q: "LLMs generate text primarily by:",
-          correct: "Predicting the next token repeatedly based on context",
+          correct: "Predicting the next token repeatedly from the given context",
           wrong: [
             "Copying exact paragraphs from the internet",
-            "Running SQL queries",
-            "Using only fixed rules",
+            "Running SQL queries on a database",
+            "Applying fixed rules only",
           ],
           explanation: "Next-token prediction is the core mechanism.",
         },
         {
           q: "Why do LLM outputs vary even for similar prompts?",
-          correct: "Because outputs are probabilistic and sampling can differ",
+          correct: "Because generation is probabilistic and sampling can differ",
           wrong: [
             "Because LLMs always hallucinate",
             "Because the model forgets every minute",
@@ -159,9 +158,9 @@ export type QuizQuestion = {
           q: "Which task is typically a strong fit for LLMs?",
           correct: "Summarizing a long customer support conversation",
           wrong: [
-            "Guaranteed correct financial accounting with zero errors",
+            "Doing financial accounting with guaranteed zero errors",
             "Producing real-time news without any provided context",
-            "Deterministically outputting the same answer always",
+            "Always outputting the same answer deterministically",
           ],
           explanation: "Summarization is a common strong use case.",
         },
@@ -177,8 +176,7 @@ export type QuizQuestion = {
         },
         {
           q: "“Freshness problem” in LLMs refers to:",
-          correct:
-            "The model may not know up-to-date information unless given context/tools",
+          correct: "The model may be outdated unless you provide context or tools",
           wrong: [
             "The model responds too quickly",
             "The model uses too much RAM",

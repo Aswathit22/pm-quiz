@@ -302,8 +302,8 @@ export default function Home() {
                   <div className="text-sm font-semibold text-slate-900">
                     2) Start the quiz
                   </div>
-                  <p className="mt-2 text-slate-600">
-                    Questions + options shuffle each attempt to prevent memorising.
+                  <p className="mt-2 text-sm text-slate-700 leading-relaxed font-medium">
+                    Learn . Test . Improve
                   </p>
 
                   {selectedTopicId ? (
