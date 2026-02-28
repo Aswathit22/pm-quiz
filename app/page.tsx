@@ -22,6 +22,14 @@ type Attempt = {
 
 const ATTEMPT_KEY = "quiz_attempts";
 const ATTEMPT_NO_PREFIX = "quiz_attempt_no_";
+const landingFiredRef = useRef(false);
+
+useEffect(() => {
+  if (landingFiredRef.current) return;
+  landingFiredRef.current = true;
+
+  trackEvent("quiz_landing_viewed");
+}, []);
 
 function getAttemptNo(topicId: string) {
   try {
