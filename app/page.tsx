@@ -340,7 +340,7 @@ export default function Home() {
                       target="_blank"
                       className="rounded-xl bg-slate-50 border border-indigo-200 px-4 py-3 font-semibold text-indigo-800 text-center hover:bg-indigo-100 hover:border-indigo-300 transition"
                     >
-                      📌 Open LinkedIn Post
+                      📌 LinkedIn Post
                     </a>
                   </div>
                 )}
@@ -470,7 +470,7 @@ export default function Home() {
                     disabled={selectedOption === null}
                     className="rounded-xl bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white px-7 py-3 font-extrabold shadow-md shadow-indigo-500/20 disabled:opacity-40 hover:brightness-105 hover:shadow-lg active:scale-[0.99] transition"
                   >
-                    {index === total - 1 ? "Finish 🎉" : "Next →"}
+                    {index === total - 1 ? "Finish 🎉" : "Next"}
                   </button>
                 </div>
               </div>
@@ -531,7 +531,7 @@ export default function Home() {
                       }}
                       className="rounded-xl border border-slate-200 px-6 py-3 font-extrabold text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm transition"
                     >
-                      Back to start
+                      Home
                     </button>
                   </div>
                 </div>
