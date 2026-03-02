@@ -31,7 +31,7 @@ export type QuizQuestion = {
     {
       id: "ai-101",
       title: "AI Foundations",
-      linkedinUrl: "https://linkedin.com/", // <-- replace with your post URL
+      linkedinUrl: "https://www.linkedin.com/posts/aswathit_beyond-the-hype-from-fixed-rules-to-learning-activity-7434077609636057089-12ba?utm_source=share&utm_medium=member_desktop&rcm=ACoAACmHIFQBQEVFBIxBiJCYM8jdMz0bNb7AR_s", // <-- replace with your post URL
       pdfUrl: "/pdfs/ai-101.pdf", // <-- place PDF at public/pdfs/ai-101.pdf
       questions: [
         {
