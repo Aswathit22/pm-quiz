@@ -205,8 +205,8 @@ export const rawTopics: Array<{
   {
     id: "genai-101",
     title: "Generative AI Foundations",
-    linkedinUrl: "https://www.linkedin.com/", // <-- replace with Topic 2 post URL
-    pdfUrl: "/pdfs/genai-101.pdf", // <-- place PDF at public/pdfs/genai-101.pdf
+    linkedinUrl: "", // Post not yet live - will be added later
+    pdfUrl: "/pdfs/genai-101.pdf",
     questions: [
       {
         q: "A PM wants a feature that turns long support chats into a 5-bullet summary. Which approach fits best?",
@@ -284,7 +284,8 @@ export const rawTopics: Array<{
       },
       {
         q: "A PM says “prompting is just an engineering detail.” What’s the best counter?",
-        correct: "Prompts shape behavior like UI copy and flow shapes user experience",
+        correct:
+          "Prompts shape behavior like UI copy and flow shapes user experience",
         wrong: [
           "Prompts are irrelevant once the model is chosen",
           "Prompts only affect speed",
@@ -295,7 +296,8 @@ export const rawTopics: Array<{
       },
       {
         q: "A chatbot answers confidently but incorrectly. What’s the most PM-appropriate fix?",
-        correct: "Add grounding via trusted docs/tools and constrain the output",
+        correct:
+          "Add grounding via trusted docs/tools and constrain the output",
         wrong: [
           "Ask the model to “be more accurate”",
           "Increase temperature for better reasoning",
@@ -317,7 +319,8 @@ export const rawTopics: Array<{
       },
       {
         q: "A tool/API call fails while generating an answer. What should a good GenAI product do?",
-        correct: "Show a fallback: ask a clarifying question or route to support",
+        correct:
+          "Show a fallback: ask a clarifying question or route to support",
         wrong: [
           "Make up an answer so the user isn’t blocked",
           "Retry forever silently",
@@ -341,11 +344,7 @@ export const rawTopics: Array<{
       {
         q: "A model gives a believable answer with made-up details. What’s the most accurate label for this behavior?",
         correct: "Hallucination",
-        wrong: [
-          "Truncation",
-          "Tokenization",
-          "Caching",
-        ],
+        wrong: ["Truncation", "Tokenization", "Caching"],
         explanation:
           "Hallucinations are confident outputs that can be incorrect or invented.",
       },
