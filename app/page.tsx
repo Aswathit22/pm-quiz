@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  rawTopics,
-  type Topic,
-  type QuizQuestion,
-  type RawQuestion,
-} from "./data/topics";
-
+import { rawTopics, type QuizQuestion, type RawQuestion } from "./data/topics";
 import { trackEvent } from "./lib/ga";
+
+type TopicLite = {
+  id: string;
+  title: string;
+  linkedinUrl: string;
+  pdfUrl: string;
+};
 
 type Attempt = {
   topicId: string;
@@ -22,6 +23,13 @@ type Attempt = {
 
 const ATTEMPT_KEY = "quiz_attempts";
 const ATTEMPT_NO_PREFIX = "quiz_attempt_no_";
+
+const TOPIC_LIST: TopicLite[] = rawTopics.map((t) => ({
+  id: t.id,
+  title: t.title,
+  linkedinUrl: t.linkedinUrl,
+  pdfUrl: t.pdfUrl,
+}));
 
 function getAttemptNo(topicId: string) {
   try {
@@ -38,7 +46,6 @@ function incrementAttemptNo(topicId: string) {
   return next;
 }
 
-/** Randomization helpers */
 function shuffle<T>(arr: T[]) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -80,12 +87,32 @@ function saveAttempt(a: Attempt) {
 
 function badgeForPercent(p: number) {
   if (p >= 90)
-    return { label: "PM Ace", emoji: "🏆", pill: "bg-amber-100 text-amber-800 border-amber-200", titleClass: "text-amber-600" };
+    return {
+      label: "PM Ace",
+      emoji: "🏆",
+      pill: "bg-amber-100 text-amber-800 border-amber-200",
+      titleClass: "text-amber-600",
+    };
   if (p >= 75)
-    return { label: "Strong Builder", emoji: "🚀", pill: "bg-indigo-100 text-indigo-800 border-indigo-200", titleClass: "text-indigo-600" };
+    return {
+      label: "Strong Builder",
+      emoji: "🚀",
+      pill: "bg-indigo-100 text-indigo-800 border-indigo-200",
+      titleClass: "text-indigo-600",
+    };
   if (p >= 50)
-    return { label: "Solid Start", emoji: "✅", pill: "bg-emerald-100 text-emerald-800 border-emerald-200", titleClass: "text-emerald-600" };
-  return { label: "Keep Going", emoji: "💪", pill: "bg-slate-100 text-slate-800 border-slate-200", titleClass: "text-slate-600" };
+    return {
+      label: "Solid Start",
+      emoji: "✅",
+      pill: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      titleClass: "text-emerald-600",
+    };
+  return {
+    label: "Keep Going",
+    emoji: "💪",
+    pill: "bg-slate-100 text-slate-800 border-slate-200",
+    titleClass: "text-slate-600",
+  };
 }
 
 function formatDate(iso: string) {
@@ -95,48 +122,19 @@ function formatDate(iso: string) {
 export default function Home() {
   const quizRef = useRef<HTMLDivElement | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
-  const [quizStartMs, setQuizStartMs] = useState<number | null>(null);
-  const [attemptNo, setAttemptNo] = useState<number>(0);
   const landingFiredRef = useRef(false);
 
-  useEffect(() => {
-    if (landingFiredRef.current) return;
-    landingFiredRef.current = true;
+  const [quizStartMs, setQuizStartMs] = useState<number | null>(null);
 
-    trackEvent("quiz_landing_viewed");
-  }, []);
-
-  // Topics for dropdown
-  const topicList: Topic[] = useMemo(
-    () =>
-      rawTopics.map((t) => ({
-        id: t.id,
-        title: t.title,
-        linkedinUrl: t.linkedinUrl,
-        pdfUrl: t.pdfUrl,
-        questions: [],
-      })),
-    []
-  );
-
-  // Topic selection
-  const [query, setQuery] = useState("");
   const [selectedTopicId, setSelectedTopicId] = useState<string>(
-    topicList.length === 1 ? topicList[0].id : ""
+    TOPIC_LIST.length === 1 ? TOPIC_LIST[0].id : ""
   );
 
   const selectedTopic = useMemo(
-    () => topicList.find((t) => t.id === selectedTopicId),
-    [topicList, selectedTopicId]
+    () => TOPIC_LIST.find((t) => t.id === selectedTopicId),
+    [selectedTopicId]
   );
 
-  const filteredTopics = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return topicList;
-    return topicList.filter((t) => t.title.toLowerCase().includes(q));
-  }, [query, topicList]);
-
-  // Quiz state
   const [started, setStarted] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [index, setIndex] = useState(0);
@@ -149,7 +147,12 @@ export default function Home() {
     setAttempts(loadAttempts());
   }, []);
 
-  // Reset when topic changes
+  useEffect(() => {
+    if (landingFiredRef.current) return;
+    landingFiredRef.current = true;
+    trackEvent("quiz_landing_viewed");
+  }, []);
+
   useEffect(() => {
     setStarted(false);
     setCompleted(false);
@@ -192,8 +195,8 @@ export default function Home() {
     const built = rawTopic ? buildQuizQuestions(rawTopic.questions) : [];
 
     setQuizQuestions(built);
+
     const nextAttempt = incrementAttemptNo(selectedTopicId);
-    setAttemptNo(nextAttempt);
     setQuizStartMs(Date.now());
 
     trackEvent("quiz_started", {
@@ -201,6 +204,7 @@ export default function Home() {
       topic_id: selectedTopicId,
       attempt_count: nextAttempt,
     });
+
     setStarted(true);
     setCompleted(false);
     setIndex(0);
@@ -211,7 +215,7 @@ export default function Home() {
   }
 
   function retry() {
-    startQuiz(); // new random attempt
+    startQuiz();
   }
 
   function back() {
@@ -250,14 +254,13 @@ export default function Home() {
 
       saveAttempt(attempt);
       setAttempts(loadAttempts());
-      const timeSpentMs = quizStartMs ? Date.now() - quizStartMs : 0;
-      
 
-      const attemptCountForEvent = getAttemptNo(selectedTopicId);
+      const timeSpentMs = quizStartMs ? Date.now() - quizStartMs : 0;
+
       trackEvent("quiz_completed", {
         topic: selectedTopic?.title ?? selectedTopicId,
         topic_id: selectedTopicId,
-        attempt_count: attemptCountForEvent,
+        attempt_count: getAttemptNo(selectedTopicId),
         score_percentage: percent,
         correct_count: finalScore,
         total_questions: total,
@@ -280,11 +283,10 @@ export default function Home() {
       className="min-h-screen p-8 md:p-14"
       style={{
         background:
-        "radial-gradient(900px circle at 8% 12%, rgba(59,130,246,0.14), transparent 58%), radial-gradient(900px circle at 92% 12%, rgba(168,85,247,0.12), transparent 58%), #fafafa",
+          "radial-gradient(900px circle at 8% 12%, rgba(59,130,246,0.14), transparent 58%), radial-gradient(900px circle at 92% 12%, rgba(168,85,247,0.12), transparent 58%), #fafafa",
       }}
     >
       <div className="mx-auto max-w-4xl bg-emerald-50/60">
-        {/* HERO / START SCREEN */}
         <div className="rounded-[28px] border border-indigo-100/80 bg-stone-50/90 backdrop-blur-xl shadow-[0_14px_45px_rgba(99,102,241,0.06),0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden">
           <div className="p-7 md:p-10">
             <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50/90 border border-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-800">
@@ -299,24 +301,15 @@ export default function Home() {
             </h1>
 
             <p className="mt-3 text-slate-600 text-base md:text-lg">
-              Short, educational MCQs. <span className="font-semibold text-slate-800">No login.</span>
+              Short, educational MCQs.{" "}
+              <span className="font-semibold text-slate-800">No login.</span>
             </p>
 
             <div className="mt-7 grid gap-5 md:grid-cols-2 items-stretch">
-              {/* Topic card */}
               <div className="rounded-3xl border-2 border-fuchsia-200/80 bg-stone-50/90 backdrop-blur p-6 shadow-sm ring-1 ring-black/5">
                 <div className="text-sm font-semibold text-indigo-900">
                   1) Select a topic
                 </div>
-
-                {topicList.length > 1 && (
-                  <input
-                    className="mt-3 w-full rounded-xl border border-indigo-200/70 bg-white px-4 py-3 text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-300 transition"
-                    placeholder="Search topics…"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                  />
-                )}
 
                 <select
                   className="mt-3 w-full rounded-xl border border-indigo-200/70 bg-white px-4 py-3 text-slate-800 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-300 transition"
@@ -324,9 +317,11 @@ export default function Home() {
                   onChange={(e) => setSelectedTopicId(e.target.value)}
                 >
                   <option value="" disabled>
-                    {topicList.length === 1 ? "Topic selected" : "Choose a topic"}
+                    {TOPIC_LIST.length === 1
+                      ? "Topic selected"
+                      : "Choose a topic"}
                   </option>
-                  {filteredTopics.map((t) => (
+                  {TOPIC_LIST.map((t) => (
                     <option key={t.id} value={t.id}>
                       {t.title}
                     </option>
@@ -335,18 +330,35 @@ export default function Home() {
 
                 {selectedTopic && (
                   <div className="mt-4 grid gap-2">
-                    <a
-                      href={selectedTopic.linkedinUrl}
-                      target="_blank"
-                      className="rounded-xl bg-slate-50 border border-indigo-200 px-4 py-3 font-semibold text-indigo-800 text-center hover:bg-indigo-100 hover:border-indigo-300 transition"
-                    >
-                      📌 LinkedIn Post
-                    </a>
+                    {selectedTopic.linkedinUrl ? (
+                      <a
+                        href={selectedTopic.linkedinUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-xl bg-slate-50 border border-indigo-200 px-4 py-3 font-semibold text-indigo-800 text-center hover:bg-indigo-100 hover:border-indigo-300 transition"
+                      >
+                        📌 LinkedIn Post
+                      </a>
+                    ) : (
+                      <div className="relative group">
+                        <button
+                          type="button"
+                          disabled
+                          className="w-full rounded-xl bg-slate-100 border border-slate-200 px-4 py-3 font-semibold text-slate-500 text-center cursor-not-allowed"
+                        >
+                          📌 LinkedIn Post
+                        </button>
+                        <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-10 hidden group-hover:block">
+                          <div className="rounded-lg bg-slate-900 text-white text-xs px-3 py-2 shadow-lg whitespace-nowrap">
+                            Post not yet live
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
 
-              {/* Start card (NO rainbow background) */}
               <div className="rounded-3xl border-2 border-fuchsia-200/80 bg-stone-50/90 backdrop-blur p-6 shadow-sm ring-1 ring-black/5">
                 <div>
                   <div className="text-sm font-semibold text-slate-900">
@@ -359,7 +371,9 @@ export default function Home() {
                   {selectedTopicId ? (
                     <div className="mt-4 flex flex-wrap gap-2">
                       <span className="text-xs font-semibold rounded-full bg-indigo-50 border border-indigo-100 px-3 py-1 text-indigo-700">
-                        15 questions
+                        {rawTopics.find((t) => t.id === selectedTopicId)?.questions
+                          .length ?? 0}{" "}
+                        questions
                       </span>
                       <span className="text-xs font-semibold rounded-full bg-fuchsia-50 border border-fuchsia-100 px-3 py-1 text-fuchsia-700">
                         Unlimited retries
@@ -390,7 +404,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* QUIZ SECTION */}
           <div className="border-t border-slate-200/80 bg-slate-50/30 p-7 md:p-10" ref={quizRef}>
             {selectedTopicId && started && currentQ && (
               <div className="rounded-3xl border-2 border-indigo-200/80 bg-white/90 backdrop-blur p-6 shadow-md shadow-indigo-500/5">
@@ -401,14 +414,15 @@ export default function Home() {
                     </span>{" "}
                     • Progress {progressPercent}%
                   </div>
-
                   <span className="text-xs font-semibold rounded-full bg-gradient-to-r from-indigo-50 to-fuchsia-50 border border-indigo-200 px-3 py-1 text-indigo-700">
+                    Keep going 🎯
                   </span>
                 </div>
 
                 <div className="mt-3 h-3 w-full rounded-full bg-slate-200 overflow-hidden">
                   <div
-                    className="h-3 rounded-full bg-gradient-to-r from-indigo-600 via-fuchsia-600 to-emerald-500 transition-all duration-300 shadow-[0_6px_16px_rgba(99,102,241,0.18)]"                    style={{ width: `${progressPercent}%` }}
+                    className="h-3 rounded-full bg-gradient-to-r from-indigo-600 via-fuchsia-600 to-emerald-500 transition-all duration-300 shadow-[0_6px_16px_rgba(99,102,241,0.18)]"
+                    style={{ width: `${progressPercent}%` }}
                   />
                 </div>
 
@@ -476,7 +490,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* RESULTS SECTION (NO rainbow background) */}
             {selectedTopicId && completed && (
               <div
                 ref={resultRef}
@@ -492,7 +505,6 @@ export default function Home() {
                       <div className="h-10 w-10 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center shadow-sm">
                         <span className="text-2xl">{badge.emoji}</span>
                       </div>
-
                       <div className={`text-3xl md:text-4xl font-extrabold ${badge.titleClass}`}>
                         {badge.label}
                       </div>
@@ -524,10 +536,7 @@ export default function Home() {
                       onClick={() => {
                         setCompleted(false);
                         setStarted(false);
-                        setTimeout(
-                          () => window.scrollTo({ top: 0, behavior: "smooth" }),
-                          80
-                        );
+                        setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 80);
                       }}
                       className="rounded-xl border border-slate-200 px-6 py-3 font-extrabold text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm transition"
                     >
@@ -551,7 +560,7 @@ export default function Home() {
                       {topicAttempts.map((a, idx) => (
                         <div
                           key={idx}
-                            className="rounded-2xl border border-slate-200 bg-stone-50/90 px-4 py-3 flex items-center justify-between hover:bg-stone-100/90 hover:shadow-sm transition"
+                          className="rounded-2xl border border-slate-200 bg-stone-50/90 px-4 py-3 flex items-center justify-between hover:bg-stone-100/90 hover:shadow-sm transition"
                         >
                           <div className="text-sm text-slate-600">
                             {formatDate(a.timestampISO)}
@@ -574,11 +583,12 @@ export default function Home() {
               </div>
             )}
 
-            {/* Idle state */}
             {selectedTopicId && !started && !completed && (
               <div className="mt-6 rounded-3xl border-2 border-indigo-200/80 bg-white/90 backdrop-blur p-6 shadow-sm border-indigo-100">
                 <div className="text-slate-600">
-                  You’re ready. Click <span className="font-semibold text-slate-800">Start Quiz</span> above.
+                  You’re ready. Click{" "}
+                  <span className="font-semibold text-slate-800">Start Quiz</span>{" "}
+                  above.
                 </div>
               </div>
             )}
