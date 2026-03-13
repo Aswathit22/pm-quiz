@@ -190,7 +190,7 @@ export const rawTopics: Topic[] = [
   {
     id: "genai-101",
     title: "Generative AI Foundations",
-    linkedinUrl: "", // Post not yet live
+    linkedinUrl: "https://www.linkedin.com/posts/aswathit_genai-foundations-activity-7437701448043327488-oi84?utm_source=share&utm_medium=member_desktop&rcm=ACoAACmHIFQBQEVFBIxBiJCYM8jdMz0bNb7AR_s", // Post not yet live
     pdfUrl: "/pdfs/genai-101.pdf",
     questions: [
       {
