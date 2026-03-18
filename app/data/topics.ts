@@ -352,7 +352,7 @@ export const rawTopics: Topic[] = [
   {
     id: "rag-101",
     title: "RAG & Knowledge Systems",
-    linkedinUrl: "",
+    linkedinUrl: "https://www.linkedin.com/posts/aswathit_rag-and-knowledge-systems-ugcPost-7439877899870064641-ONUN?utm_source=share&utm_medium=member_desktop&rcm=ACoAACmHIFQBQEVFBIxBiJCYM8jdMz0bNb7AR_s",
     pdfUrl: "/pdfs/rag-101.pdf",
     questions: [
       {
